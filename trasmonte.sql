@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 26, 2025 at 11:41 PM
+-- Generation Time: Apr 08, 2025 at 12:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,7 +38,8 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`id`, `username`, `password`) VALUES
-(1, 'zeke', '$2y$10$hMmYNWzo3PRbcQiFaZoOqO7/f3jtM8SSLWazpuo3teOQBIoPXZm7S');
+(1, 'zeke', '$2y$10$hMmYNWzo3PRbcQiFaZoOqO7/f3jtM8SSLWazpuo3teOQBIoPXZm7S'),
+(2, 'vevien', '$2y$10$JrQPY1vsgp8cWT8K7ZwYpeC1abPUcTtrnCLVxyPqHkN8y8CUndBa.');
 
 -- --------------------------------------------------------
 
@@ -121,6 +122,15 @@ CREATE TABLE `login_attempts` (
   `status` enum('failed','granted','removed') DEFAULT 'failed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `login_attempts`
+--
+
+INSERT INTO `login_attempts` (`id`, `username`, `ip_address`, `attempt_time`, `status`) VALUES
+(1, 'kiddy', '::1', '2025-02-27 06:49:58', 'removed'),
+(2, 'sisa', '::1', '2025-02-27 08:26:26', 'failed'),
+(3, 'sisa', '::1', '2025-02-27 08:26:50', 'failed');
+
 -- --------------------------------------------------------
 
 --
@@ -130,38 +140,43 @@ CREATE TABLE `login_attempts` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`) VALUES
-(1, 'loray', '$2y$10$W0dV0TbeOo7gXed3dlPr5OBRO6xTFl1DGvJKFgtMHixQdSYajJv5e'),
-(8, 'mariel', '$2y$10$aQU8SFuzi6Fv4CEpYGqnceGS03tOHB6s0fIP2PgMBsi/ScnClEpKi'),
-(9, 'saraum', '$2y$10$sxFckfh9NCIlJM/mOqyrc.34TDCPzXvobU6LOkjO56inwn17ctjtC'),
-(10, 'alabs', '$2y$10$xeeODsQCdAabIiZ.yzxfLOAu7zLAoa1TMkzObwluU7kpJHngr7alu'),
-(11, 'aldrian', '$2y$10$uRbSHOroJyR9RxsmBRIpVurZxy43oawd75pJpwdWTGjMp0VYOLkY.'),
-(12, 'boggy', '$2y$10$9C18TI9GSaYivkr6A1NTfeGX8f5/bkmlHPq4WiL5o3NA349aP9TI.'),
-(13, 'vevien', '$2y$10$CvwSuaF71owPN53uQXqpsee3HuBGMymVcUeqrcs57TOe04mq/xDmC'),
-(14, 'jaging', '$2y$10$H59YLKLJDlwATV6VmRlS1uYm.uBGL.BTGCz1XzkkrgRcsStF4WLaO'),
-(15, 'banuging', '$2y$10$pRRmRJxExppZuIRrPQeXyepDaSMEFwGmMhuwpdEJOQSXJJYOemqLy'),
-(16, 'lor', '$2y$10$tY4Kh0AR7MxE4MIxc3Kkju.4iVgAahrxJ0Agxc/W1170Adz0ol0WW'),
-(17, 'ld', '$2y$10$5nYfSAJDe37IfpPMrCVRDuQYelBDqv2Ce49m2OWm6g/jpYIFmltHy'),
-(18, 'kaka', '$2y$10$RmCgjwb6VTyuEiNxQDX3tOu5VNApKWpWwSRY0xQQhOQoevGQPikYm'),
-(19, '20221185', '$2y$10$JtXk7Y1h5nPHkqIxIAQyIOdOLXDgbsYQfZWJaLAJHhVCwoV3lHg.G'),
-(20, 'degol', '$2y$10$BRcmgnwzVzU03gU./60u..iAkZd2/oHkYRKcEsAybzIUoC0dpWAsC'),
-(21, '20224567', '$2y$10$Jx0mVT5ZA3HDB9BhnfWSC.joBYQV9gTlo9zCdkuSF5pAcaiFJDX82'),
-(22, '20211185', '$2y$10$86IvdS2ZwUtR9Ls22znNduy4yn.4a0ik6pfUnL/ThR/eew1C7cdRq'),
-(23, '64363453', '$2y$10$Oyq2fFiHm.BAkvuJ3EupROrmYQjL7NMs1dijLiWoAOPYcbnwq4URu'),
-(24, '55553453', '$2y$10$/uZiy1O8NFFU90Qg/IqOX.Op5.LIDa5pq4CX8P3RcDtAPuJ.Go9rW'),
-(25, 'althia', '$2y$10$S/BJtuNa.qjU77dAiCrvjueMqalRrGDla2EDGFH64ahIxrH0zWx3y'),
-(26, 'roren', '$2y$10$Ne9nMr6H.qtQl/7E9NappeTQmbsTHGmpZYY274DxJTPf1Icpk17IW'),
-(27, 'rory', '$2y$10$8NG.tZWGJPktq3D967yQ6OOXw6oJcihqTbm3Ch0o9dJxKp1kKCRLG'),
-(28, 'kiddy', '$2y$10$nCqBLbWN4RWtZDNZhD6IwO5oIdYYveJofqMrKt83x6R0zPr1icynS'),
-(29, 'maricel', '$2y$10$v8uH6W5IylcMKt9U/lZ0Eu3kfD49MlRSExP6vvVi6xkgXgwqz3g9e'),
-(30, 'wenj', '$2y$10$ZFrkWmfI5DsJC1Ss/F5qKerXG.qqSOmu19vmACCRzJbsSKOeCJAAW');
+INSERT INTO `users` (`id`, `username`, `password`, `phone`) VALUES
+(1, 'loray', '$2y$10$W0dV0TbeOo7gXed3dlPr5OBRO6xTFl1DGvJKFgtMHixQdSYajJv5e', ''),
+(8, 'mariel', '$2y$10$aQU8SFuzi6Fv4CEpYGqnceGS03tOHB6s0fIP2PgMBsi/ScnClEpKi', ''),
+(9, 'saraum', '$2y$10$sxFckfh9NCIlJM/mOqyrc.34TDCPzXvobU6LOkjO56inwn17ctjtC', ''),
+(10, 'alabs', '$2y$10$xeeODsQCdAabIiZ.yzxfLOAu7zLAoa1TMkzObwluU7kpJHngr7alu', ''),
+(11, 'aldrian', '$2y$10$uRbSHOroJyR9RxsmBRIpVurZxy43oawd75pJpwdWTGjMp0VYOLkY.', ''),
+(12, 'boggy', '$2y$10$9C18TI9GSaYivkr6A1NTfeGX8f5/bkmlHPq4WiL5o3NA349aP9TI.', ''),
+(13, 'vevien', '$2y$10$CvwSuaF71owPN53uQXqpsee3HuBGMymVcUeqrcs57TOe04mq/xDmC', ''),
+(14, 'jaging', '$2y$10$H59YLKLJDlwATV6VmRlS1uYm.uBGL.BTGCz1XzkkrgRcsStF4WLaO', ''),
+(15, 'banuging', '$2y$10$pRRmRJxExppZuIRrPQeXyepDaSMEFwGmMhuwpdEJOQSXJJYOemqLy', ''),
+(16, 'lor', '$2y$10$tY4Kh0AR7MxE4MIxc3Kkju.4iVgAahrxJ0Agxc/W1170Adz0ol0WW', ''),
+(17, 'ld', '$2y$10$5nYfSAJDe37IfpPMrCVRDuQYelBDqv2Ce49m2OWm6g/jpYIFmltHy', ''),
+(18, 'kaka', '$2y$10$RmCgjwb6VTyuEiNxQDX3tOu5VNApKWpWwSRY0xQQhOQoevGQPikYm', ''),
+(19, '20221185', '$2y$10$JtXk7Y1h5nPHkqIxIAQyIOdOLXDgbsYQfZWJaLAJHhVCwoV3lHg.G', ''),
+(20, 'degol', '$2y$10$BRcmgnwzVzU03gU./60u..iAkZd2/oHkYRKcEsAybzIUoC0dpWAsC', ''),
+(21, '20224567', '$2y$10$Jx0mVT5ZA3HDB9BhnfWSC.joBYQV9gTlo9zCdkuSF5pAcaiFJDX82', ''),
+(22, '20211185', '$2y$10$86IvdS2ZwUtR9Ls22znNduy4yn.4a0ik6pfUnL/ThR/eew1C7cdRq', ''),
+(23, '64363453', '$2y$10$Oyq2fFiHm.BAkvuJ3EupROrmYQjL7NMs1dijLiWoAOPYcbnwq4URu', ''),
+(24, '55553453', '$2y$10$/uZiy1O8NFFU90Qg/IqOX.Op5.LIDa5pq4CX8P3RcDtAPuJ.Go9rW', ''),
+(25, 'althia', '$2y$10$S/BJtuNa.qjU77dAiCrvjueMqalRrGDla2EDGFH64ahIxrH0zWx3y', ''),
+(26, 'roren', '$2y$10$Ne9nMr6H.qtQl/7E9NappeTQmbsTHGmpZYY274DxJTPf1Icpk17IW', ''),
+(27, 'rory', '$2y$10$8NG.tZWGJPktq3D967yQ6OOXw6oJcihqTbm3Ch0o9dJxKp1kKCRLG', ''),
+(28, 'kiddy', '$2y$10$nCqBLbWN4RWtZDNZhD6IwO5oIdYYveJofqMrKt83x6R0zPr1icynS', ''),
+(29, 'maricel', '$2y$10$v8uH6W5IylcMKt9U/lZ0Eu3kfD49MlRSExP6vvVi6xkgXgwqz3g9e', ''),
+(30, 'wenj', '$2y$10$ZFrkWmfI5DsJC1Ss/F5qKerXG.qqSOmu19vmACCRzJbsSKOeCJAAW', ''),
+(31, 'dacol', '$2y$10$2AABzOcu5.qggrboBE.Zo.Ryndg7CFLjaLgK3zVtJJNcYkm4dFfqS', ''),
+(32, 'tine', '$2y$10$EpFa1I3zp82mBibftd2mZ.9ZtFmK026UYGQksdEHVMznHkYIjGHJK', ''),
+(33, 'roll', '$2y$10$Q/ObqKHavuubY.OHerLeUeQqpaMVxwcJfByRcQK/6ByzwN5LY/w6i', ''),
+(34, 'sisa', '$2y$10$c6POxp18kpt9GqkojbQgKu5XSD4w/0JNoAqfxr.3z2cW8lDW7xB4O', '');
 
 --
 -- Indexes for dumped tables
@@ -209,7 +224,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `books`
@@ -227,13 +242,13 @@ ALTER TABLE `borrowed_books`
 -- AUTO_INCREMENT for table `login_attempts`
 --
 ALTER TABLE `login_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables
