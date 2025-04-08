@@ -10,7 +10,7 @@ $show_verification = false;
 
 // If max attempts are reached, force phone verification
 if ($_SESSION['failed_attempts'] >= 2) {
-    $error_message = "Too many failed attempts. Please verify your phone number.";
+    $error_message = "⚠️ Too many failed attempts. Please verify your phone number.";
     $show_verification = true;
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['username']) && isset($_POST['password'])) {
@@ -35,10 +35,10 @@ if ($_SESSION['failed_attempts'] >= 2) {
                 ->execute([$username, $ip]);
 
             if ($_SESSION['failed_attempts'] >= 2) {
-                $error_message = "Too many failed attempts. Please verify your phone number.";
+                $error_message = "⚠️ Too many failed attempts. Please verify your phone number.";
                 $show_verification = true;
             } else {
-                $error_message = "Invalid credentials. Attempt {$_SESSION['failed_attempts']} of 2.";
+                $error_message = "⚠️ Invalid credentials. Attempt {$_SESSION['failed_attempts']} of 2.";
             }
         }
     } elseif (isset($_POST['verify_phone'])) {
@@ -53,7 +53,7 @@ if ($_SESSION['failed_attempts'] >= 2) {
             header("Location: reset_password.php");
             exit();
         } else {
-            $error_message = "Phone number not recognized.";
+            $error_message = "⚠️ Phone number not recognized.";
             $show_verification = true;
         }
     }
@@ -111,9 +111,15 @@ if ($_SESSION['failed_attempts'] >= 2) {
         }
         .message {
             margin-top: 10px;
-            color: red;
             text-align: center;
             font-weight: bold;
+        }
+        .message.warning {
+            color: red;
+            border: 1px solid red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
         }
         p {
             text-align: center;
@@ -134,7 +140,7 @@ if ($_SESSION['failed_attempts'] >= 2) {
         <h2>Login</h2>
 
         <?php if ($error_message): ?>
-            <div class="message"><?= htmlspecialchars($error_message) ?></div>
+            <div class="message warning"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
 
         <?php if (!$show_verification): ?>

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $userExists = $checkStmt->fetchColumn();
 
         if ($userExists) {
-            $message = "<p style='color: red; text-align: center;'>Username is already taken.</p>";
+            $message = "<p class='error-message'>Username is already taken.</p>";
         } else {
             try {
                 $stmt = $pdo->prepare("INSERT INTO users (username, password, phone) VALUES (?, ?, ?)");
@@ -36,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 header("Location: dashboard.php");
                 exit();
             } catch (PDOException $e) {
-                $message = "<p style='color: red; text-align: center;'>An error occurred. Please try again later.</p>";
+                $message = "<p class='error-message'>An error occurred. Please try again later.</p>";
             }
         }
     } else {
-        $message = "<p style='color: red; text-align: center;'>All fields are required.</p>";
+        $message = "<p class='error-message'>All fields are required.</p>";
     }
 }
 ?>
@@ -53,10 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Register</title>
     <style>
         body {
-            background-color: #f0f2f5;
+            background-color: #f4f4f4;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
@@ -107,6 +107,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .footer-link a:hover {
             text-decoration: underline;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
         }
     </style>
 </head>
