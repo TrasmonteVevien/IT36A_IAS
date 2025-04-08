@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 08, 2025 at 06:25 PM
+-- Generation Time: Apr 08, 2025 at 07:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -119,25 +119,28 @@ CREATE TABLE `login_attempts` (
   `username` varchar(50) NOT NULL,
   `ip_address` varchar(45) NOT NULL,
   `attempt_time` datetime DEFAULT current_timestamp(),
-  `status` enum('failed','granted','removed') DEFAULT 'failed'
+  `status` enum('failed','granted','removed') DEFAULT 'failed',
+  `phone_number` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `login_attempts`
 --
 
-INSERT INTO `login_attempts` (`id`, `username`, `ip_address`, `attempt_time`, `status`) VALUES
-(1, 'kiddy', '::1', '2025-02-27 06:49:58', 'removed'),
-(2, 'sisa', '::1', '2025-02-27 08:26:26', 'failed'),
-(3, 'sisa', '::1', '2025-02-27 08:26:50', 'failed'),
-(4, 'xoxo', '::1', '2025-04-08 21:36:36', 'failed'),
-(5, 'xoxo', '::1', '2025-04-08 21:36:43', 'failed'),
-(6, 'xoxo', '::1', '2025-04-08 23:24:35', 'failed'),
-(7, 'xoxo', '::1', '2025-04-08 23:24:41', 'failed'),
-(8, 'opop', '::1', '2025-04-08 23:25:47', 'failed'),
-(9, 'opop', '::1', '2025-04-08 23:25:51', 'failed'),
-(10, 'xoxo', '::1', '2025-04-09 00:04:15', 'failed'),
-(11, 'xoxo', '::1', '2025-04-09 00:04:18', 'failed');
+INSERT INTO `login_attempts` (`id`, `username`, `ip_address`, `attempt_time`, `status`, `phone_number`) VALUES
+(1, 'kiddy', '::1', '2025-02-27 06:49:58', 'removed', NULL),
+(2, 'sisa', '::1', '2025-02-27 08:26:26', 'failed', NULL),
+(3, 'sisa', '::1', '2025-02-27 08:26:50', 'failed', NULL),
+(4, 'xoxo', '::1', '2025-04-08 21:36:36', 'failed', NULL),
+(5, 'xoxo', '::1', '2025-04-08 21:36:43', 'failed', NULL),
+(6, 'xoxo', '::1', '2025-04-08 23:24:35', 'failed', NULL),
+(7, 'xoxo', '::1', '2025-04-08 23:24:41', 'failed', NULL),
+(8, 'opop', '::1', '2025-04-08 23:25:47', 'failed', NULL),
+(9, 'opop', '::1', '2025-04-08 23:25:51', 'failed', NULL),
+(10, 'xoxo', '::1', '2025-04-09 00:04:15', 'failed', NULL),
+(11, 'xoxo', '::1', '2025-04-09 00:04:18', 'failed', NULL),
+(12, 'cece', '::1', '2025-04-09 01:11:42', 'failed', NULL),
+(13, 'cece', '::1', '2025-04-09 01:11:45', 'granted', NULL);
 
 -- --------------------------------------------------------
 
@@ -200,7 +203,8 @@ INSERT INTO `users` (`id`, `username`, `password`, `phone`) VALUES
 (33, 'roll', '$2y$10$Q/ObqKHavuubY.OHerLeUeQqpaMVxwcJfByRcQK/6ByzwN5LY/w6i', ''),
 (34, 'sisa', '$2y$10$c6POxp18kpt9GqkojbQgKu5XSD4w/0JNoAqfxr.3z2cW8lDW7xB4O', ''),
 (35, 'xoxo', '$2y$10$wE.aKtk1odpFzQf0OtHIHewb3gUIbjZgu5hkwsUMuCEjUDoXVKmhS', '09511959950'),
-(36, 'opop', '$2y$10$ry5JeQvujzbi3MA2yI.i4eKvN1SBW386GiRx3U8C89b4XUcOXJi.W', '09511959950');
+(36, 'opop', '$2y$10$ry5JeQvujzbi3MA2yI.i4eKvN1SBW386GiRx3U8C89b4XUcOXJi.W', '09511959950'),
+(37, 'cece', '$2y$10$0sM00z/Mk5g77ELQ2t/X5OmtzNUErJXFmkuGF/DwAXll4He1Zcqeq', '09511959950');
 
 --
 -- Indexes for dumped tables
@@ -272,7 +276,7 @@ ALTER TABLE `borrowed_books`
 -- AUTO_INCREMENT for table `login_attempts`
 --
 ALTER TABLE `login_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `login_verification_requests`
@@ -284,7 +288,7 @@ ALTER TABLE `login_verification_requests`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Constraints for dumped tables

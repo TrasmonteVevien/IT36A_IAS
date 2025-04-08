@@ -84,27 +84,31 @@ if (isset($_SESSION['login_notifier'])) {
     <div class="container">
         <h2>Admin Dashboard</h2>
         <?php if (!empty($loginMessage)): ?>
-            <p class="notifier"> <?= htmlspecialchars($loginMessage) ?> </p>
+            <p class="notifier"><?= htmlspecialchars($loginMessage) ?></p>
         <?php endif; ?>
+
         <a href="admin_login_attempts.php" class="button">View Login Attempts</a>
         <a href="logout.php" class="button" style="background-color: #dc3545;">Logout</a>
-        
+
         <h3>Recent Login Attempts</h3>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Phone Number</th>
-        <th>Time</th>
-        <th>Status</th>
-    </tr>
-    <?php foreach ($loginAttempts as $attempt): ?>
-        <tr>
-            <td><?= htmlspecialchars($attempt['id']) ?></td>
-            <td><?= htmlspecialchars($attempt['username']) ?></td>
-            <td><?= htmlspecialchars($attempt['phone_number']) ?></td>
-            <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
-            <td><?= htmlspecialchars($attempt['status']) ?></td>
-        </tr>
-    <?php endforeach; ?>
-</table>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Phone Number</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+            <?php foreach ($loginAttempts as $attempt): ?>
+                <tr>
+                    <td><?= htmlspecialchars($attempt['id']) ?></td>
+                    <td><?= htmlspecialchars($attempt['username']) ?></td>
+                    <td><?= htmlspecialchars($attempt['phone_number']) ?></td>
+                    <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
+                    <td><?= htmlspecialchars($attempt['status']) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
+</body>
+</html>
