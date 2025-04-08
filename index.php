@@ -2,24 +2,20 @@
 include 'config.php';
 session_start();
 
+// Initialize attempt count
 if (!isset($_SESSION['failed_attempts'])) $_SESSION['failed_attempts'] = 0;
-if (!isset($_SESSION['lockout_time'])) $_SESSION['lockout_time'] = 0;
-
-$max_attempts = 2;
-$lockout_duration = 10; // in seconds
-$error_message = '';
 $username = $_SESSION['last_username'] ?? '';
+$error_message = '';
 $show_verification = false;
 
-// Check lockout status
-if (time() < $_SESSION['lockout_time']) {
-    $remaining = $_SESSION['lockout_time'] - time();
-    $error_message = "Too many failed attempts. Try again in {$remaining} seconds.";
+// If max attempts are reached, force phone verification
+if ($_SESSION['failed_attempts'] >= 2) {
+    $error_message = "Too many failed attempts. Please verify your phone number.";
     $show_verification = true;
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['username']) && isset($_POST['password'])) {
         $username = trim($_POST['username']);
-        $_SESSION['last_username'] = $username; // Save username to session for repopulating
+        $_SESSION['last_username'] = $username;
         $password = trim($_POST['password']);
         $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -30,7 +26,6 @@ if (time() < $_SESSION['lockout_time']) {
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['failed_attempts'] = 0;
-            $_SESSION['lockout_time'] = 0;
             unset($_SESSION['last_username']);
             header("Location: dashboard.php");
             exit();
@@ -39,12 +34,11 @@ if (time() < $_SESSION['lockout_time']) {
             $pdo->prepare("INSERT INTO login_attempts (username, ip_address, attempt_time) VALUES (?, ?, NOW())")
                 ->execute([$username, $ip]);
 
-            if ($_SESSION['failed_attempts'] >= $max_attempts) {
-                $_SESSION['lockout_time'] = time() + $lockout_duration;
-                $error_message = "Too many failed attempts. Try again in {$lockout_duration} seconds.";
+            if ($_SESSION['failed_attempts'] >= 2) {
+                $error_message = "Too many failed attempts. Please verify your phone number.";
                 $show_verification = true;
             } else {
-                $error_message = "Invalid credentials. Attempt {$_SESSION['failed_attempts']} of $max_attempts.";
+                $error_message = "Invalid credentials. Attempt {$_SESSION['failed_attempts']} of 2.";
             }
         }
     } elseif (isset($_POST['verify_phone'])) {
@@ -56,7 +50,6 @@ if (time() < $_SESSION['lockout_time']) {
         if ($user) {
             $_SESSION['verify_user_id'] = $user['id'];
             $_SESSION['failed_attempts'] = 0;
-            $_SESSION['lockout_time'] = 0;
             header("Location: reset_password.php");
             exit();
         } else {

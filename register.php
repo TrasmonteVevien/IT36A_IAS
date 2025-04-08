@@ -2,24 +2,26 @@
 include 'config.php';
 session_start();
 
-// Redirect to dashboard if already logged in
+// Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard.php");
     exit();
 }
 
 $message = '';
+$username = '';
+$phone = '';
 
-// Registration logic
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'] ?? '';
-    $phone = $_POST['phone'] ?? '';
+    $username = trim($_POST['username'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
     $passwordRaw = $_POST['password'] ?? '';
 
     if (!empty($username) && !empty($phone) && !empty($passwordRaw)) {
         $password = password_hash($passwordRaw, PASSWORD_BCRYPT);
 
-        // Check if username already exists
+        // Check if username exists
         $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
         $checkStmt->execute([$username]);
         $userExists = $checkStmt->fetchColumn();
@@ -27,12 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($userExists) {
             $message = "<p style='color: red; text-align: center;'>Username is already taken.</p>";
         } else {
-            // Insert new user with phone number
-            $stmt = $pdo->prepare("INSERT INTO users (username, password, phone) VALUES (?, ?, ?)");
             try {
+                $stmt = $pdo->prepare("INSERT INTO users (username, password, phone) VALUES (?, ?, ?)");
                 $stmt->execute([$username, $password, $phone]);
                 $_SESSION['user_id'] = $pdo->lastInsertId();
-                header("Location: dashboard.php"); // Redirect after successful registration
+                header("Location: dashboard.php");
                 exit();
             } catch (PDOException $e) {
                 $message = "<p style='color: red; text-align: center;'>An error occurred. Please try again later.</p>";
@@ -114,8 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h2>Register</h2>
         <?= $message ?>
         <form method="post">
-            <input type="text" name="username" placeholder="Username" required><br>
-            <input type="text" name="phone" placeholder="Phone Number" required><br>
+            <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($username) ?>" required><br>
+            <input type="text" name="phone" placeholder="Phone Number" value="<?= htmlspecialchars($phone) ?>" required><br>
             <input type="password" name="password" placeholder="Password" required><br>
             <button type="submit">Register</button>
         </form>
