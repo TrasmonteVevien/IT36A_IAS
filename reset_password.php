@@ -3,7 +3,7 @@ include 'config.php';
 session_start();
 
 if (!isset($_SESSION['verify_user_id'])) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
     $stmt->execute([$new_password, $_SESSION['verify_user_id']]);
     unset($_SESSION['verify_user_id']);
-    $message = "Password updated successfully. <a href='login.php'>Login now</a>.";
+    $message = "Password updated successfully. <a href='index.php'>Login now</a>.";
 }
 ?>
 

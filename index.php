@@ -6,7 +6,7 @@ if (!isset($_SESSION['failed_attempts'])) $_SESSION['failed_attempts'] = 0;
 if (!isset($_SESSION['lockout_time'])) $_SESSION['lockout_time'] = 0;
 
 $max_attempts = 2;
-$lockout_duration = 10; // 10 seconds
+$lockout_duration = 10; // in seconds
 $error_message = '';
 $username = $_SESSION['last_username'] ?? '';
 $show_verification = false;
@@ -19,6 +19,7 @@ if (time() < $_SESSION['lockout_time']) {
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['username']) && isset($_POST['password'])) {
         $username = trim($_POST['username']);
+        $_SESSION['last_username'] = $username; // Save username to session for repopulating
         $password = trim($_POST['password']);
         $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -30,6 +31,7 @@ if (time() < $_SESSION['lockout_time']) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['failed_attempts'] = 0;
             $_SESSION['lockout_time'] = 0;
+            unset($_SESSION['last_username']);
             header("Location: dashboard.php");
             exit();
         } else {
@@ -45,15 +47,16 @@ if (time() < $_SESSION['lockout_time']) {
                 $error_message = "Invalid credentials. Attempt {$_SESSION['failed_attempts']} of $max_attempts.";
             }
         }
-        $username = '';
     } elseif (isset($_POST['verify_phone'])) {
-        $phone_input = $_POST['verify_phone'];
+        $phone_input = trim($_POST['verify_phone']);
         $stmt = $pdo->prepare("SELECT * FROM users WHERE phone = ?");
         $stmt->execute([$phone_input]);
         $user = $stmt->fetch();
 
         if ($user) {
             $_SESSION['verify_user_id'] = $user['id'];
+            $_SESSION['failed_attempts'] = 0;
+            $_SESSION['lockout_time'] = 0;
             header("Location: reset_password.php");
             exit();
         } else {
@@ -72,11 +75,12 @@ if (time() < $_SESSION['lockout_time']) {
     <style>
         body {
             background-color: #f4f4f4;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
         .login-container {
             background: white;
@@ -84,16 +88,20 @@ if (time() < $_SESSION['lockout_time']) {
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             width: 400px;
+            box-sizing: border-box;
         }
         h2 {
             margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
         }
         input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 16px;
         }
         button {
             width: 100%;
@@ -112,12 +120,26 @@ if (time() < $_SESSION['lockout_time']) {
             margin-top: 10px;
             color: red;
             text-align: center;
+            font-weight: bold;
+        }
+        p {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h2>Login</h2>
+
         <?php if ($error_message): ?>
             <div class="message"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
@@ -135,7 +157,7 @@ if (time() < $_SESSION['lockout_time']) {
             </form>
         <?php endif; ?>
 
-        <p style="margin-top: 10px;">Don't have an account? <a href="register.php">Register</a></p>
+        <p>Don't have an account? <a href="register.php">Register</a></p>
     </div>
 </body>
 </html>
