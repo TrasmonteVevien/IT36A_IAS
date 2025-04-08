@@ -90,24 +90,21 @@ if (isset($_SESSION['login_notifier'])) {
         <a href="logout.php" class="button" style="background-color: #dc3545;">Logout</a>
         
         <h3>Recent Login Attempts</h3>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>IP Address</th>
-                <th>Time</th>
-                <th>Status</th>
-            </tr>
-            <?php foreach ($loginAttempts as $attempt): ?>
-                <tr>
-                    <td><?= htmlspecialchars($attempt['id']) ?></td>
-                    <td><?= htmlspecialchars($attempt['username']) ?></td>
-                    <td><?= htmlspecialchars($attempt['ip_address']) ?></td>
-                    <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
-                    <td><?= htmlspecialchars($attempt['status']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
-    </div>
-</body>
-</html>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Phone Number</th>
+        <th>Time</th>
+        <th>Status</th>
+    </tr>
+    <?php foreach ($loginAttempts as $attempt): ?>
+        <tr>
+            <td><?= htmlspecialchars($attempt['id']) ?></td>
+            <td><?= htmlspecialchars($attempt['username']) ?></td>
+            <td><?= htmlspecialchars($attempt['phone_number']) ?></td>
+            <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
+            <td><?= htmlspecialchars($attempt['status']) ?></td>
+        </tr>
+    <?php endforeach; ?>
+</table>

@@ -4,7 +4,7 @@ session_start();
 
 // Redirect if already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header("Location: admin_dashboard.php");
+    header("Location: admin_user_request.php");
     exit();
 }
 
