@@ -17,6 +17,37 @@ if (isset($_SESSION['login_notifier'])) {
     $loginMessage = $_SESSION['login_notifier'];
     unset($_SESSION['login_notifier']);
 }
+
+// Handle phone verification and granting access
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_phone'])) {
+    $phone_input = trim($_POST['phone_input']);
+    $attempt_id = $_POST['attempt_id'];
+
+    // Sanitize input to prevent SQL injection and malicious input
+    $phone_input = filter_var($phone_input, FILTER_SANITIZE_STRING);
+
+    // Fetch the corresponding login attempt
+    $stmt = $pdo->prepare("SELECT * FROM login_attempts WHERE id = ?");
+    $stmt->execute([$attempt_id]);
+    $attempt = $stmt->fetch();
+
+    if ($attempt) {
+        // Check if the phone matches
+        if ($attempt['phone_number'] == $phone_input) {
+            // Update login attempt status to "Verified" and grant access
+            $pdo->prepare("UPDATE login_attempts SET status = 'Verified' WHERE id = ?")
+                ->execute([$attempt_id]);
+            $_SESSION['login_notifier'] = "Phone number verified. User can reset password.";
+        } else {
+            // Update login attempt status to "Denied"
+            $pdo->prepare("UPDATE login_attempts SET status = 'Denied' WHERE id = ?")
+                ->execute([$attempt_id]);
+            $_SESSION['login_notifier'] = "Phone number does not match. Please try again later.";
+        }
+    }
+    header("Location: admin_dashboard.php"); // Reload the page to see changes
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,6 +109,43 @@ if (isset($_SESSION['login_notifier'])) {
         .button:hover {
             background-color: #218838;
         }
+        .deny-button {
+            background-color: #dc3545;
+        }
+        .deny-button:hover {
+            background-color: #c82333;
+        }
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            justify-content: center;
+            align-items: center;
+        }
+        .confirmation-modal-content {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .confirmation-modal button {
+            margin: 5px;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .confirm-btn {
+            background-color: #28a745;
+        }
+        .cancel-btn {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -87,7 +155,6 @@ if (isset($_SESSION['login_notifier'])) {
             <p class="notifier"><?= htmlspecialchars($loginMessage) ?></p>
         <?php endif; ?>
 
-        <a href="admin_login_attempts.php" class="button">View Login Attempts</a>
         <a href="logout.php" class="button" style="background-color: #dc3545;">Logout</a>
 
         <h3>Recent Login Attempts</h3>
@@ -98,6 +165,7 @@ if (isset($_SESSION['login_notifier'])) {
                 <th>Phone Number</th>
                 <th>Time</th>
                 <th>Status</th>
+                <th>Action</th>
             </tr>
             <?php foreach ($loginAttempts as $attempt): ?>
                 <tr>
@@ -106,9 +174,50 @@ if (isset($_SESSION['login_notifier'])) {
                     <td><?= htmlspecialchars($attempt['phone_number']) ?></td>
                     <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
                     <td><?= htmlspecialchars($attempt['status']) ?></td>
+                    <td>
+                        <?php if ($attempt['status'] == 'Pending'): ?>
+                            <form method="post" style="display:inline;">
+                                <input type="text" name="phone_input" placeholder="Enter Phone Number" required>
+                                <input type="hidden" name="attempt_id" value="<?= $attempt['id'] ?>">
+                                <button type="submit" name="verify_phone" class="button">Verify Phone</button>
+                            </form>
+                            <a href="reset_password.php?user_id=<?= $attempt['id'] ?>" class="button">Grant Access</a>
+                            <button class="button deny-button" onclick="showModal(<?= $attempt['id'] ?>)">Deny Access</button>
+                        <?php else: ?>
+                            <span>Verified / Denied</span>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </table>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-modal-content">
+            <h3>Are you sure you want to deny access?</h3>
+            <button id="confirmBtn" class="confirm-btn">Yes</button>
+            <button id="cancelBtn" class="cancel-btn">No</button>
+        </div>
+    </div>
+
+    <script>
+        function showModal(attemptId) {
+            // Show the modal
+            document.getElementById('confirmationModal').style.display = 'flex';
+
+            // Add event listener to confirm button
+            document.getElementById('confirmBtn').onclick = function() {
+                // Redirect to deny access page with the attempt ID
+                window.location.href = "deny_access.php?user_id=" + attemptId;
+            };
+
+            // Add event listener to cancel button
+            document.getElementById('cancelBtn').onclick = function() {
+                // Close the modal without taking action
+                document.getElementById('confirmationModal').style.display = 'none';
+            };
+        }
+    </script>
 </body>
 </html>

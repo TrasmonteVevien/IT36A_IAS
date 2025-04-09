@@ -2,14 +2,11 @@
 include 'config.php';
 session_start();
 
-// Initialize attempt count
 if (!isset($_SESSION['failed_attempts'])) $_SESSION['failed_attempts'] = 0;
 $username = $_SESSION['last_username'] ?? '';
 $error_message = '';
 $show_verification = false;
-$show_approval_message = false;
 
-// If max attempts are reached, force phone verification
 if ($_SESSION['failed_attempts'] >= 2) {
     $error_message = "⚠️ Too many failed attempts. Please verify your phone number.";
     $show_verification = true;
@@ -49,18 +46,14 @@ if ($_SESSION['failed_attempts'] >= 2) {
         $user = $stmt->fetch();
 
         if ($user) {
-            if ($user['phone_approved'] == 0) {
-                $_SESSION['verify_user_id'] = $user['id'];
-                $_SESSION['failed_attempts'] = 0;
-                $error_message = "⚠️ Please wait for admin approval.";
-                $show_approval_message = true;
-            } else {
-                $_SESSION['verify_user_id'] = $user['id'];
-                $_SESSION['failed_attempts'] = 0;
-                header("Location: reset_password.php");
-                exit();
-            }
+            // Direct match, proceed to reset password
+            $_SESSION['phone_match'] = 'match'; 
+            $_SESSION['failed_attempts'] = 0;
+            header("Location: reset_password.php");
+            exit();
         } else {
+            // Phone number doesn't match
+            $_SESSION['phone_match'] = 'not_match'; 
             $error_message = "⚠️ Phone number not recognized.";
             $show_verification = true;
         }
@@ -145,6 +138,7 @@ if ($_SESSION['failed_attempts'] >= 2) {
     </style>
 </head>
 <body>
+
     <div class="login-container">
         <h2>Login</h2>
 
@@ -152,9 +146,7 @@ if ($_SESSION['failed_attempts'] >= 2) {
             <div class="message warning"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
 
-        <?php if ($show_approval_message): ?>
-            <div class="message warning"><?= htmlspecialchars($error_message) ?></div>
-        <?php elseif (!$show_verification): ?>
+        <?php if (!$show_verification): ?>
             <form method="post">
                 <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($username) ?>" required>
                 <input type="password" name="password" placeholder="Password" required>
@@ -175,11 +167,20 @@ if ($_SESSION['failed_attempts'] >= 2) {
         const verifyForm = document.querySelector('form input[name="verify_phone"]')?.form;
         const verifyButton = verifyForm?.querySelector('button');
 
+        // Alert messages based on session flag
+        <?php if (isset($_SESSION['phone_match'])): ?>
+            <?php if ($_SESSION['phone_match'] === 'match'): ?>
+                alert("✅ MATCH! You can now reset your password.");
+            <?php elseif ($_SESSION['phone_match'] === 'not_match'): ?>
+                alert("❌ NOT MATCH! Please try again later.");
+            <?php endif; ?>
+            <?php unset($_SESSION['phone_match']); ?>
+        <?php endif; ?>
+
         if (verifyForm && verifyButton) {
-            verifyForm.addEventListener('submit', function (e) {
+            verifyForm.addEventListener('submit', function () {
                 verifyButton.disabled = true;
                 verifyButton.innerText = 'Verifying...';
-                alert("Please wait for admin approval.");
             });
         }
     });
