@@ -10,15 +10,13 @@ if (isset($_SESSION['user_id'])) {
 
 $message = '';
 $username = '';
-$phone = '';
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $phone = trim($_POST['phone'] ?? '');
     $passwordRaw = $_POST['password'] ?? '';
 
-    if (!empty($username) && !empty($phone) && !empty($passwordRaw)) {
+    if (!empty($username) && !empty($passwordRaw)) {
         $password = password_hash($passwordRaw, PASSWORD_BCRYPT);
 
         // Check if username exists
@@ -30,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message = "<p class='error-message'>Username is already taken.</p>";
         } else {
             try {
-                $stmt = $pdo->prepare("INSERT INTO users (username, password, phone) VALUES (?, ?, ?)");
-                $stmt->execute([$username, $password, $phone]);
+                $stmt = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+                $stmt->execute([$username, $password]);
                 $_SESSION['user_id'] = $pdo->lastInsertId();
                 header("Location: dashboard.php");
                 exit();
@@ -122,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?= $message ?>
         <form method="post">
             <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($username) ?>" required><br>
-            <input type="text" name="phone" placeholder="Phone Number" value="<?= htmlspecialchars($phone) ?>" required><br>
             <input type="password" name="password" placeholder="Password" required><br>
             <button type="submit">Register</button>
         </form>

@@ -5,12 +5,8 @@ session_start();
 if (!isset($_SESSION['failed_attempts'])) $_SESSION['failed_attempts'] = 0;
 $username = $_SESSION['last_username'] ?? '';
 $error_message = '';
-$show_verification = false;
 
-if ($_SESSION['failed_attempts'] >= 2) {
-    $error_message = "⚠️ Too many failed attempts. Please verify your phone number.";
-    $show_verification = true;
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['username']) && isset($_POST['password'])) {
         $username = trim($_POST['username']);
         $_SESSION['last_username'] = $username;
@@ -33,29 +29,10 @@ if ($_SESSION['failed_attempts'] >= 2) {
                 ->execute([$username, $ip]);
 
             if ($_SESSION['failed_attempts'] >= 2) {
-                $error_message = "⚠️ Too many failed attempts. Please verify your phone number.";
-                $show_verification = true;
+                $error_message = "⚠️ Too many failed attempts. Please try again later.";
             } else {
                 $error_message = "⚠️ Invalid credentials. Attempt {$_SESSION['failed_attempts']} of 2.";
             }
-        }
-    } elseif (isset($_POST['verify_phone'])) {
-        $phone_input = trim($_POST['verify_phone']);
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE phone = ?");
-        $stmt->execute([$phone_input]);
-        $user = $stmt->fetch();
-
-        if ($user) {
-            // Direct match, proceed to reset password
-            $_SESSION['phone_match'] = 'match'; 
-            $_SESSION['failed_attempts'] = 0;
-            header("Location: reset_password.php");
-            exit();
-        } else {
-            // Phone number doesn't match
-            $_SESSION['phone_match'] = 'not_match'; 
-            $error_message = "⚠️ Phone number not recognized.";
-            $show_verification = true;
         }
     }
 }
@@ -146,44 +123,14 @@ if ($_SESSION['failed_attempts'] >= 2) {
             <div class="message warning"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
 
-        <?php if (!$show_verification): ?>
-            <form method="post">
-                <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($username) ?>" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-        <?php else: ?>
-            <form method="post" id="verifyForm">
-                <input type="text" name="verify_phone" placeholder="Enter Registered Phone Number" required>
-                <button type="submit" id="verifyButton">Verify Phone</button>
-            </form>
-        <?php endif; ?>
+        <form method="post">
+            <input type="text" name="username" placeholder="Username" value="<?= htmlspecialchars($username) ?>" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
 
         <p>Don't have an account? <a href="register.php">Register</a></p>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const verifyForm = document.querySelector('form input[name="verify_phone"]')?.form;
-        const verifyButton = verifyForm?.querySelector('button');
-
-        // Alert messages based on session flag
-        <?php if (isset($_SESSION['phone_match'])): ?>
-            <?php if ($_SESSION['phone_match'] === 'match'): ?>
-                alert("✅ MATCH! You can now reset your password.");
-            <?php elseif ($_SESSION['phone_match'] === 'not_match'): ?>
-                alert("❌ NOT MATCH! Please try again later.");
-            <?php endif; ?>
-            <?php unset($_SESSION['phone_match']); ?>
-        <?php endif; ?>
-
-        if (verifyForm && verifyButton) {
-            verifyForm.addEventListener('submit', function () {
-                verifyButton.disabled = true;
-                verifyButton.innerText = 'Verifying...';
-            });
-        }
-    });
-    </script>
 </body>
 </html>
